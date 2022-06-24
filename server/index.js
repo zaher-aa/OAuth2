@@ -1,13 +1,16 @@
 import express from 'express';
 import axios from 'axios';
 import { OAuth2Client } from 'google-auth-library';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const {
-  env: { CLIENT_ID },
+  env: { GOOGLE_CLIENT_ID, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET },
 } = process;
 
 const app = express();
-const client = new OAuth2Client(CLIENT_ID);
+const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 app.use(express.json());
 app.set('port', 5000);
@@ -18,7 +21,7 @@ app.post('/login/google', async (req, res) => {
   const verify = async () => {
     const ticket = await client.verifyIdToken({
       idToken: tokenId,
-      audience: CLIENT_ID,
+      audience: GOOGLE_CLIENT_ID,
     });
 
     const payload = ticket.getPayload();
@@ -36,6 +39,35 @@ app.post('/login/google', async (req, res) => {
   );
 
   res.json({ data: userInfo });
+});
+
+app.post('/login/github', async (req, res) => {
+  const { code } = req.body;
+  const url = `https://github.com/login/oauth/access_token?client_id=${GITHUB_CLIENT_ID}&client_secret=${GITHUB_CLIENT_SECRET}&code=${code}&redirect_uri=http://localhost:3000`;
+
+  try {
+    const {
+      data: { access_token },
+    } = await axios({
+      method: 'POST',
+      url: url,
+      headers: {
+        accept: 'application/json',
+      },
+    });
+    console.log(access_token);
+    const { data: userInfo } = await axios({
+      method: 'GET',
+      url: 'https://api.github.com/user',
+      headers: {
+        Authorization: `token ${access_token}`,
+      },
+    });
+
+    res.json({ data: userInfo });
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 app.listen(app.get('port'), () =>
