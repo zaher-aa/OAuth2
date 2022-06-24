@@ -3,12 +3,22 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "dev": "",
+    "dev": "nodemon ./server",
     "dev:client": "cd client; yarn start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "google-auth-library": "^8.0.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.18"
+  }
 }

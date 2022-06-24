@@ -19,8 +19,8 @@ function App() {
     const { tokenId } = res;
 
     try {
-      const backendResponse = await axios.post('/login/google', { tokenId });
-      console.log(backendResponse);
+      const { data: userInfo } = await axios.post('/login/google', { tokenId });
+      console.log(userInfo);
     } catch (err) {
       console.log(err);
     }
